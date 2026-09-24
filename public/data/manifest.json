@@ -1,0 +1,112 @@
+{
+  "rfx": "rfx/KF-PPE-FY27.json",
+  "rfx_pdf": "rfx/KF-PPE-FY27.pdf",
+  "buyer_provides_on_request": [
+    {
+      "file": "reference/PO-2025-118_Northstar.pdf",
+      "when": "Only after Clearbid asks for last year's rates. Not loaded upfront."
+    }
+  ],
+  "arrival_batches": {
+    "1": "Arrives first (days 3-5 after RFx)",
+    "2": "Arrives later (days 9-10)"
+  },
+  "responses": [
+    {
+      "vendor_id": "V1",
+      "vendor": "SafeGuard Industrial Supplies",
+      "received": "2026-09-11",
+      "batch": 1,
+      "email": "responses/01_safeguard/email.eml",
+      "quote_files": [
+        "responses/01_safeguard/SafeGuard_Quotation_SG-Q-26-27-0412.xlsx"
+      ],
+      "attachments": [
+        "responses/01_safeguard/attachments/BIS_Licence_SafeGuard.pdf",
+        "responses/01_safeguard/attachments/EN388_TestReport_SG-CUT3.pdf",
+        "responses/01_safeguard/attachments/GST_Registration_SafeGuard.pdf",
+        "responses/01_safeguard/attachments/ISO9001_Certificate_SafeGuard.pdf"
+      ],
+      "short": "SafeGuard",
+      "contact": "Nikhil Rao",
+      "email_address": "sales@safeguardindustrial.in",
+      "city": "Mumbai"
+    },
+    {
+      "vendor_id": "V2",
+      "vendor": "Raksha Safety Solutions",
+      "received": "2026-09-12",
+      "batch": 1,
+      "email": "responses/02_raksha/email.eml",
+      "quote_files": [
+        "responses/02_raksha/Raksha_Quotation_RSS-2627-118.pdf"
+      ],
+      "attachments": [
+        "responses/02_raksha/attachments/BIS_Licence_Raksha.pdf",
+        "responses/02_raksha/attachments/EN388_TestReport_RK-CUT.pdf",
+        "responses/02_raksha/attachments/GST_Registration_Raksha.pdf",
+        "responses/02_raksha/attachments/ISO9001_Certificate_Raksha.pdf"
+      ],
+      "short": "Raksha",
+      "contact": "Pooja Malhotra",
+      "email_address": "quotes@rakshasafety.co.in",
+      "city": "New Delhi"
+    },
+    {
+      "vendor_id": "V3",
+      "vendor": "Apar Protective Wear LLP",
+      "received": "2026-09-17",
+      "batch": 2,
+      "email": "responses/03_apar/email.eml",
+      "quote_files": [
+        "responses/03_apar/Apar_Offer_APR-KF-2026-077.docx"
+      ],
+      "attachments": [
+        "responses/03_apar/attachments/BIS_Licence_Apar.pdf",
+        "responses/03_apar/attachments/GST_Registration_Apar.pdf",
+        "responses/03_apar/attachments/ISO9001_Certificate_Apar.pdf",
+        "responses/03_apar/attachments/Quotation_SunriseDairy_SD-114.pdf"
+      ],
+      "short": "Apar",
+      "contact": "S. Karthik",
+      "email_address": "karthik@aparprotective.in",
+      "city": "Chennai"
+    },
+    {
+      "vendor_id": "V4",
+      "vendor": "Shree Balaji Traders",
+      "received": "2026-09-13",
+      "batch": 1,
+      "email": "responses/04_balaji/email.eml",
+      "quote_files": [
+        "responses/04_balaji/IMG_20260913_184512.jpg"
+      ],
+      "attachments": [
+        "responses/04_balaji/attachments/BIS_Licence_Balaji.pdf",
+        "responses/04_balaji/attachments/GST_Registration_Balaji.pdf",
+        "responses/04_balaji/attachments/ISO9001_Certificate_Balaji.pdf"
+      ],
+      "short": "Balaji",
+      "contact": "Manoj Gupta",
+      "email_address": "balajitraders.gzb@gmail.com",
+      "city": "Ghaziabad"
+    },
+    {
+      "vendor_id": "V5",
+      "vendor": "Northstar Safety Imports",
+      "received": "2026-09-18",
+      "batch": 2,
+      "email": "responses/05_northstar/email.eml",
+      "quote_files": [],
+      "attachments": [
+        "responses/05_northstar/attachments/EN388_TestReport_NS-TUFF5.pdf",
+        "responses/05_northstar/attachments/GST_Registration_Northstar.pdf",
+        "responses/05_northstar/attachments/ISO9001_Certificate_Northstar.pdf"
+      ],
+      "short": "Northstar",
+      "contact": "Arjun Menon",
+      "email_address": "arjun@northstarsafety.com",
+      "city": "Mumbai"
+    }
+  ]
+}

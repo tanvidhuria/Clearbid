@@ -1,0 +1,340 @@
+{
+  "rfx_id": "KF-PPE-FY27",
+  "title": "12-month rate contract: PPE and industrial safety supplies, Oct 2026 to Sep 2027",
+  "buyer_company": "Kaveri Foods Pvt Ltd",
+  "buyer_name": "Riya Sharma",
+  "buyer_title": "Category Buyer, Indirect & MRO",
+  "buyer_email": "riya.sharma@kaverifoods.in",
+  "approver": "Anil Mehta, VP Procurement",
+  "issued": "2026-09-08",
+  "due": "2026-09-18",
+  "currency": "INR",
+  "plants": [
+    {
+      "id": "PUN",
+      "name": "Pune (Chakan MIDC)",
+      "share": 0.4
+    },
+    {
+      "id": "SON",
+      "name": "Sonipat (Kundli)",
+      "share": 0.35
+    },
+    {
+      "id": "HOS",
+      "name": "Hosur (SIPCOT)",
+      "share": 0.25
+    }
+  ],
+  "lines": [
+    {
+      "id": "L01",
+      "group": "Head & face",
+      "item": "Safety helmet, ratchet, white",
+      "spec": "ISI marked IS 2925, HDPE shell, 6-point ratchet harness, chin strap",
+      "unit": "piece",
+      "qty": 1800
+    },
+    {
+      "id": "L02",
+      "group": "Head & face",
+      "item": "Safety helmet, pinlock, yellow",
+      "spec": "ISI marked IS 2925, HDPE shell, pinlock harness",
+      "unit": "piece",
+      "qty": 1200
+    },
+    {
+      "id": "L03",
+      "group": "Head & face",
+      "item": "Face shield with headgear",
+      "spec": "Polycarbonate visor 1 mm, 8 inch, adjustable headgear",
+      "unit": "piece",
+      "qty": 300
+    },
+    {
+      "id": "L04",
+      "group": "Head & face",
+      "item": "Safety goggles, anti-fog",
+      "spec": "EN 166, indirect vent, anti-fog and anti-scratch coated",
+      "unit": "piece",
+      "qty": 1500
+    },
+    {
+      "id": "L05",
+      "group": "Head & face",
+      "item": "Safety spectacles, clear",
+      "spec": "EN 166, polycarbonate lens, side shields",
+      "unit": "piece",
+      "qty": 2400
+    },
+    {
+      "id": "L06",
+      "group": "Hands",
+      "item": "Nitrile disposable gloves, size M",
+      "spec": "Powder-free, 4 mil, food-contact safe, blue",
+      "unit": "box of 100 pcs",
+      "qty": 1500
+    },
+    {
+      "id": "L07",
+      "group": "Hands",
+      "item": "Nitrile disposable gloves, size L",
+      "spec": "Powder-free, 4 mil, food-contact safe, blue",
+      "unit": "box of 100 pcs",
+      "qty": 1200
+    },
+    {
+      "id": "L08",
+      "group": "Hands",
+      "item": "Cut-resistant gloves",
+      "spec": "EN 388 level 4X43C, HPPE liner, PU palm coating",
+      "unit": "pair",
+      "qty": 6000
+    },
+    {
+      "id": "L09",
+      "group": "Hands",
+      "item": "Cotton knitted gloves",
+      "spec": "60 g per pair, 10 gauge, bleached white",
+      "unit": "pair",
+      "qty": 24000
+    },
+    {
+      "id": "L10",
+      "group": "Hands",
+      "item": "Leather palm gloves",
+      "spec": "Split leather palm, cotton back, knit wrist",
+      "unit": "pair",
+      "qty": 4000
+    },
+    {
+      "id": "L11",
+      "group": "Hands",
+      "item": "Heat-resistant gloves",
+      "spec": "Aramid, rated to 350 C contact heat, 35 cm",
+      "unit": "pair",
+      "qty": 600
+    },
+    {
+      "id": "L12",
+      "group": "Hands",
+      "item": "Chemical-resistant nitrile gauntlets",
+      "spec": "15 mil, 33 cm, flock lined, EN 374",
+      "unit": "pair",
+      "qty": 1800
+    },
+    {
+      "id": "L13",
+      "group": "Feet",
+      "item": "Safety shoes, steel toe, lace-up",
+      "spec": "ISI marked IS 15298, PU dual-density sole, sizes 6-11",
+      "unit": "pair",
+      "qty": 2200
+    },
+    {
+      "id": "L14",
+      "group": "Feet",
+      "item": "Safety shoes, anti-static, slip-on",
+      "spec": "ISI marked IS 15298, anti-static, elastic side, sizes 6-11",
+      "unit": "pair",
+      "qty": 800
+    },
+    {
+      "id": "L15",
+      "group": "Feet",
+      "item": "Gumboots, steel toe",
+      "spec": "PVC, steel toe cap, 14 inch, food-plant white",
+      "unit": "pair",
+      "qty": 700
+    },
+    {
+      "id": "L16",
+      "group": "Hearing & breathing",
+      "item": "Foam ear plugs, corded",
+      "spec": "NRR 29 dB, PU foam, corded",
+      "unit": "pair",
+      "qty": 30000
+    },
+    {
+      "id": "L17",
+      "group": "Hearing & breathing",
+      "item": "Ear muffs",
+      "spec": "NRR 25 dB, adjustable headband",
+      "unit": "piece",
+      "qty": 400
+    },
+    {
+      "id": "L18",
+      "group": "Hearing & breathing",
+      "item": "N95 respirator mask with valve",
+      "spec": "BIS IS 9473 FFP2 or NIOSH N95, exhalation valve",
+      "unit": "piece",
+      "qty": 20000
+    },
+    {
+      "id": "L19",
+      "group": "Hearing & breathing",
+      "item": "Surgical mask, 3-ply",
+      "spec": "3-ply, ear loop, BFE 98% or better",
+      "unit": "piece",
+      "qty": 150000
+    },
+    {
+      "id": "L20",
+      "group": "Hearing & breathing",
+      "item": "Half-face respirator with cartridges",
+      "spec": "Twin cartridge, organic vapour cartridges included",
+      "unit": "piece",
+      "qty": 150
+    },
+    {
+      "id": "L21",
+      "group": "Body & fall",
+      "item": "Hi-vis reflective vest",
+      "spec": "Class 2, fluorescent orange, 2 inch reflective tape",
+      "unit": "piece",
+      "qty": 2500
+    },
+    {
+      "id": "L22",
+      "group": "Body & fall",
+      "item": "Cotton coverall",
+      "spec": "240 GSM cotton drill, reflective tape, navy",
+      "unit": "piece",
+      "qty": 3000
+    },
+    {
+      "id": "L23",
+      "group": "Body & fall",
+      "item": "Disposable coverall",
+      "spec": "Type 5/6, hooded, microporous",
+      "unit": "piece",
+      "qty": 2000
+    },
+    {
+      "id": "L24",
+      "group": "Body & fall",
+      "item": "PVC rain suit",
+      "spec": "Jacket and trouser set, 0.35 mm PVC",
+      "unit": "set",
+      "qty": 900
+    },
+    {
+      "id": "L25",
+      "group": "Body & fall",
+      "item": "Full body harness",
+      "spec": "IS 3521, double lanyard, scaffold hooks",
+      "unit": "piece",
+      "qty": 250
+    },
+    {
+      "id": "L26",
+      "group": "Body & fall",
+      "item": "Energy-absorbing lanyard",
+      "spec": "1.8 m, shock absorber, 55 mm hook",
+      "unit": "piece",
+      "qty": 250
+    },
+    {
+      "id": "L27",
+      "group": "Food-plant hygiene",
+      "item": "Disposable hairnet (bouffant cap)",
+      "spec": "21 inch, non-woven, white",
+      "unit": "pack of 100 pcs",
+      "qty": 3000
+    },
+    {
+      "id": "L28",
+      "group": "Food-plant hygiene",
+      "item": "Disposable beard cover",
+      "spec": "Non-woven, white, elastic",
+      "unit": "pack of 100 pcs",
+      "qty": 1200
+    },
+    {
+      "id": "L29",
+      "group": "Food-plant hygiene",
+      "item": "Disposable shoe cover",
+      "spec": "PE, 2.5 g, blue",
+      "unit": "pack of 100 pcs",
+      "qty": 2000
+    },
+    {
+      "id": "L30",
+      "group": "Food-plant hygiene",
+      "item": "PVC apron, food grade",
+      "spec": "1000 x 1200 mm, 0.3 mm, white",
+      "unit": "piece",
+      "qty": 1500
+    }
+  ],
+  "questionnaire": [
+    {
+      "id": "Q1",
+      "question": "Do the helmets and safety shoes you offer carry the ISI mark (IS 2925 and IS 15298)? Share BIS licence numbers.",
+      "type": "gate"
+    },
+    {
+      "id": "Q2",
+      "question": "Attach the EN 388 test report for the cut-resistant glove model you are quoting.",
+      "type": "evidence"
+    },
+    {
+      "id": "Q3",
+      "question": "Do you hold a valid ISO 9001 certificate? Attach a copy.",
+      "type": "gate"
+    },
+    {
+      "id": "Q4",
+      "question": "Lead time from purchase order to delivery, in days.",
+      "type": "gate"
+    },
+    {
+      "id": "Q5",
+      "question": "Minimum order quantity per line, if any.",
+      "type": "info"
+    },
+    {
+      "id": "Q6",
+      "question": "Payment terms offered (Kaveri standard is 60 days from delivery).",
+      "type": "info"
+    },
+    {
+      "id": "Q7",
+      "question": "Can you deliver to all three plants (Pune, Sonipat, Hosur)?",
+      "type": "info"
+    },
+    {
+      "id": "Q8",
+      "question": "Replacement policy for defective or non-conforming goods.",
+      "type": "info"
+    },
+    {
+      "id": "Q9",
+      "question": "Minimum remaining shelf life of disposables (masks, gloves) at delivery.",
+      "type": "info"
+    },
+    {
+      "id": "Q10",
+      "question": "Can you provide samples before the order? Lead time for samples.",
+      "type": "info"
+    }
+  ],
+  "qualification_rule": "Qualified if: ISI licences evidenced for helmets and shoes (Q1), valid ISO 9001 on the award date (Q3), and lead time of 21 days or less for every quoted line (Q4).",
+  "terms": [
+    "Quote in INR, per the unit stated for each line, excluding GST. Show GST rate separately.",
+    "Prices to be delivered (landed) to each of the three plants. State the freight basis if not included.",
+    "State pack size wherever you quote per box, packet or carton.",
+    "Quote every line. If you cannot supply a line, write 'Not quoted'. Do not offer substitutes without marking them.",
+    "Payment terms: 60 days from delivery (Kaveri standard). State any deviation.",
+    "Quotation validity: at least 90 days from the due date.",
+    "Contract period: 1 October 2026 to 30 September 2027, with call-off orders per plant."
+  ],
+  "vendors_invited": [
+    "SafeGuard Industrial Supplies",
+    "Raksha Safety Solutions",
+    "Apar Protective Wear LLP",
+    "Shree Balaji Traders",
+    "Northstar Safety Imports"
+  ]
+}
