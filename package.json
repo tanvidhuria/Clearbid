@@ -1,0 +1,24 @@
+{
+  "name": "clearbid",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.60.0",
+    "@fontsource/ibm-plex-sans": "^5.0.0",
+    "docx": "^9.0.0",
+    "mammoth": "^1.8.0",
+    "next": "14.2.30",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-markdown": "^9.0.1",
+    "recharts": "^2.12.7",
+    "remark-gfm": "^4.0.0",
+    "unpdf": "^0.12.1",
+    "xlsx": "^0.18.5"
+  }
+}
