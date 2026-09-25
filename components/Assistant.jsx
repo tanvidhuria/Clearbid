@@ -144,7 +144,15 @@ export default function Assistant({ st, patch, comp, compState, status, askAllow
       <div className="chat-log" ref={log}>
         {!st.chat.length && (
           <div className="msg ai"><div className="bubble">
-            <p>Hi, I'm your sourcing assistant for {st.rfx.rfx_id}. Ask me to change the RFx, send it, receive and read replies, or answer anything about the quotes, all from here.</p>
+            <p>Hi, I'm Clearbid, your sourcing assistant. I can help you:</p>
+            <ul style={{ margin: "4px 0 8px", paddingLeft: 18 }}>
+              <li>draft an RFx from your requirements sheet</li>
+              <li>send it to vendors and read their replies, in any format</li>
+              <li>compare quotes side by side and find the best vendor</li>
+              <li>spot errors or missing details and draft emails to vendors</li>
+              <li>answer questions with tables and charts, and export the award</li>
+            </ul>
+            <p>What would you like to start with?</p>
           </div></div>
         )}
         {st.chat.map((m, i) => m.role === "user" ? <div key={i} className="msg user">{m.content}</div> : <Answer key={i} a={m.answer || {}} comp={comp} />)}
