@@ -31,6 +31,19 @@ function vendorsFromManifest(m) {
   return out;
 }
 
+// Decide a file's role from its name: the cover email, the quotation itself, or a supporting document
+export function roleFor(name) {
+  if (/\.(eml|txt|msg)$/i.test(name)) return "email";
+  if (/(iso|bis|gst|en ?388|licen[cs]e|certif|registration|test ?report)/i.test(name)) return "attachment";
+  if (/(quot|offer|rate|price|img_|photo|\.xlsx$|\.docx$|\.jpe?g$|\.png$)/i.test(name)) return "quote";
+  return "attachment";
+}
+function withRoles(files) {
+  const out = files.map((f) => ({ name: f.name, blob: f, role: roleFor(f.name) }));
+  if (!out.some((f) => f.role === "quote")) { const i = out.findIndex((f) => f.role !== "email"); if (i >= 0) out[i].role = "quote"; }
+  return out;
+}
+
 function initialState(published, manifest) {
   return {
     step: "rfx", rfx: { ...published, title: "New RFx (draft)", lines: [], questionnaire: [], terms: [] }, sent: false, outbox: [],
@@ -42,6 +55,7 @@ function initialState(published, manifest) {
 
 export default function App() {
   const [boot, setBoot] = useState(null);
+  const bootRef = useRef(null); bootRef.current = boot;
   const [st, setSt] = useState(null);
   const [authed, setAuthed] = useState(false);
   const [used, setUsed] = useState(0);
@@ -91,19 +105,24 @@ export default function App() {
     })();
   }, [st, patchVendor]);
 
-  const ensureRfx = (s) => (s.rfx.lines.length ? s.rfx : boot.published);
+  const ensureRfx = (s) => (s.rfx.lines.length ? s.rfx : bootRef.current.published);
   const deliver = (batch) => patch((s) => ({ ...s, rfx: ensureRfx(s), vendors: Object.fromEntries(Object.entries(s.vendors).map(([k, v]) =>
     [k, v.batch === batch && v.status === "waiting" ? { ...v, status: "queued", delivered: true } : v])) }));
   const rerun = (id) => patchVendor(id, { status: "queued", error: null });
   const deliverFollowups = () => patch((s) => ({ ...s, vendors: Object.fromEntries(Object.entries(s.vendors).map(([k, v]) =>
     [k, v.followupFiles?.length && !v.followupReceived && v.status === "done"
       ? { ...v, files: [...v.files, ...v.followupFiles], followupReceived: true, status: "queued", before: { landed: null } } : v])) }));
-  const addFilesToVendor = (id, files) => patch((s) => ({ ...s, vendors: { ...s.vendors, [id]: { ...s.vendors[id], status: "queued",
-    files: [...s.vendors[id].files, ...files.map((f) => ({ name: f.name, blob: f, role: "followup" }))] } } }));
+  // A vendor's first response replaces its placeholder files; a later one is added as a follow-up
+  const addFilesToVendor = (id, files) => patch((s) => {
+    const v = s.vendors[id];
+    const first = v.status === "waiting" || v.uploadedFresh === undefined && !v.readAt && !v.fromSnapshot;
+    return { ...s, rfx: ensureRfx(s), vendors: { ...s.vendors, [id]: { ...v, status: "queued", delivered: true, uploadedFresh: true, overrides: {},
+      files: first ? withRoles(files) : [...v.files, ...files.map((f) => ({ name: f.name, blob: f, role: "followup" }))] } } };
+  });
   const addUpload = (name, files) => {
     const id = "U" + Date.now().toString(36);
     patch((s) => ({ ...s, vendors: { ...s.vendors, [id]: { id, name, short: name.split(" ")[0], received: today(), batch: 0, status: "queued", delivered: true, uploaded: true,
-      files: files.map((f, i) => ({ name: f.name, blob: f, role: i === 0 ? "quote" : "attachment" })) } } }));
+      files: withRoles(files) } } }));
   };
   const resolveReference = async (id, file) => {
     const v = stRef.current.vendors[id];
@@ -148,8 +167,15 @@ export default function App() {
         patch({ step: "responses" });
       }
       else if (name === "add_vendor_response" && files.length) {
-        const v = findVendor(input.vendor);
-        if (v) addFilesToVendor(v.id, files); else addUpload(input.vendor || "New vendor", files);
+        const multi = actions.filter((a) => a.name === "add_vendor_response").length > 1;
+        const key = String(input.vendor || "").toLowerCase().split(/\s+/)[0];
+        let mine = input.files?.length ? files.filter((f) => input.files.some((n) => n.toLowerCase() === f.name.toLowerCase())) : [];
+        if (!mine.length && !multi) mine = files;
+        if (!mine.length && key) mine = files.filter((f) => f.name.toLowerCase().includes(key));
+        if (mine.length) {
+          const v = findVendor(input.vendor);
+          if (v) addFilesToVendor(v.id, mine); else addUpload(input.vendor || "New vendor", mine);
+        }
         patch({ step: "responses" });
       }
       else if (name === "load_saved_run") { loadRun().then(() => patch({ step: "compare" })).catch(() => {}); }
