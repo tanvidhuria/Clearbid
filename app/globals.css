@@ -206,3 +206,19 @@ blockquote.src { margin: 0; border-left: 3px solid var(--green); background: var
   .split { display: block; }
   .panel { border: 0; }
 }
+
+/* ---------- single assistant panel ---------- */
+.shell.three { grid-template-columns: 220px minmax(0, 1fr) 400px; }
+.assistant { position: sticky; top: 0; height: 100vh; background: #fff; border-left: 1px solid var(--line-strong); display: flex; flex-direction: column; min-width: 0; }
+.assistant-head { padding: 16px 16px 12px; border-bottom: 1px solid var(--line); }
+.assistant .chat-log { flex: 1; }
+.assistant .suggest { padding-top: 8px; border-top: 1px solid var(--line); }
+.assistant .answer-block { padding: 10px 12px; }
+.assistant table.plain { font-size: 12px; }
+.btn.small { padding: 4px 9px; font-size: 12.5px; }
+@media (max-width: 1280px) { .shell.three { grid-template-columns: 200px minmax(0, 1fr) 360px; } }
+@media (max-width: 1080px) {
+  .shell.three { grid-template-columns: 1fr; }
+  .assistant { position: static; height: 70vh; border-left: 0; border-top: 1px solid var(--line-strong); }
+}
+@media print { .assistant { display: none !important; } }

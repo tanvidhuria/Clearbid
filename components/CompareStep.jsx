@@ -10,13 +10,15 @@ const STATUS_TONE = { ok: "ok", converted: "ok", confirmed: "ok", review: "warn"
 export default function CompareStep({ st, patch, patchVendor, comp, resolveReference, go }) {
   const [tab, setTab] = useState("grid");
   const [sel, setSel] = useState(null);
-  const [mail, setMail] = useState(null);
   if (!comp) return (
     <>
       <div className="page-head"><div><h1>Compare</h1><p>Nothing to compare yet.</p></div></div>
       <p className="notice">Receive and read at least one vendor response first. <button className="btn ghost" onClick={() => go("responses")}>Go to responses</button></p>
     </>
   );
+  const mailV = st.mailFor ? comp.vendors.find((v) => v.id === st.mailFor) : null;
+  const mail = mailV ? { vendor: mailV } : null;
+  const setMail = (m) => patch({ mailFor: m ? m.vendor.id : null });
   const setA = (p) => patch((s) => ({ ...s, assumptions: { ...s.assumptions, ...p } }));
   const refVendors = comp.vendors.filter((v) => v.reference_count > 0 || st.vendors[v.id]?.reference);
   const review = comp.vendors.reduce((a, v) => a + v.review_count, 0);
@@ -26,11 +28,10 @@ export default function CompareStep({ st, patch, patchVendor, comp, resolveRefer
       <div className="page-head">
         <div>
           <h1>Compare</h1>
-          <p>Every price converted to the RFx unit and to rupees, landed at the plants, pre-GST. Click any cell to see where it came from. Amber means a person should look.</p>
+          <p>Every price converted to the RFx unit and to rupees, landed at the plants, pre-GST. Click any cell to see where it came from. Amber means a person should look. Ask the assistant anything about it.</p>
         </div>
         <div className="row">
           <button className="btn" onClick={() => exportComparisonXlsx(comp)}>Download Excel</button>
-          <button className="btn primary" onClick={() => go("ask")}>Ask the analyst</button>
         </div>
       </div>
 

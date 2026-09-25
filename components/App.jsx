@@ -8,7 +8,8 @@ import RfxStep from "./RfxStep.jsx";
 import SendStep from "./SendStep.jsx";
 import ResponsesStep from "./ResponsesStep.jsx";
 import CompareStep from "./CompareStep.jsx";
-import AnalystStep from "./AnalystStep.jsx";
+import Assistant from "./Assistant.jsx";
+import { exportRfxDocx, exportComparisonXlsx, exportAwardDocx } from "../lib/client/exports.js";
 
 const KEY = "clearbid-v1";
 const today = () => new Date().toISOString().slice(0, 10);
@@ -34,7 +35,7 @@ function initialState(published, manifest) {
     step: "rfx", rfx: published, copilot: [], sent: false, outbox: [],
     vendors: vendorsFromManifest(manifest),
     assumptions: { fx_usd_inr: 88.5, award_date: today(), discounts_enabled: {} },
-    analyst: [], emails: {},
+    chat: [], emails: {}, mailFor: null,
   };
 }
 
@@ -52,7 +53,7 @@ export default function App() {
       setBoot({ manifest: m, published: r });
       let saved = null;
       try { saved = JSON.parse(localStorage.getItem(KEY) || "null"); } catch {}
-      setSt(saved && saved.rfx ? saved : initialState(r, m));
+      setSt(saved && saved.rfx ? { chat: [], ...saved, step: saved.step === "ask" ? "compare" : saved.step } : initialState(r, m));
       setUsed(Number(localStorage.getItem("clearbid-questions") || 0));
       setAuthed(!!getCode() || false);
       fetch("/snapshots/run.json", { method: "HEAD" }).then((x) => setHasSnapshot(x.ok)).catch(() => {});
@@ -104,6 +105,17 @@ export default function App() {
     catch (e) { patchVendor(id, { refBusy: false, refError: e.message }); }
   };
 
+  const sendRfx = () => patch((s) => {
+    if (s.sent) return s;
+    const at = new Date().toISOString();
+    const vs = Object.values(s.vendors).filter((v) => !v.uploaded);
+    return { ...s, sent: true, sentAt: at, outbox: [...s.outbox, ...vs.map((v) => ({ to: `${v.name} <${v.email_address}>`, subject: `RFx ${s.rfx.rfx_id}: request for quotation`, at, kind: "RFx" }))] };
+  });
+  const findVendor = (name) => {
+    const n = String(name || "").toLowerCase();
+    return Object.values(stRef.current.vendors).find((v) => v.id.toLowerCase() === n || v.short.toLowerCase() === n || v.name.toLowerCase().includes(n) || n.includes(v.short.toLowerCase()));
+  };
+
   const saveRun = () => {
     const snap = { version: 1, savedAt: new Date().toISOString(), rfx_id: st.rfx.rfx_id,
       vendors: Object.fromEntries(Object.values(st.vendors).filter((v) => v.status === "done" && !v.uploaded)
@@ -119,6 +131,27 @@ export default function App() {
     applySnapshot(snap);
   };
 
+  const onActions = useCallback((actions, answer) => {
+    for (const { name, input } of actions) {
+      if (name === "navigate") patch({ step: input.view });
+      else if (name === "send_rfx") { sendRfx(); patch({ step: "send" }); }
+      else if (name === "receive_replies") { if (input.which !== "last") deliver(1); if (input.which !== "first") deliver(2); patch({ step: "responses" }); }
+      else if (name === "load_saved_run") { loadRun().then(() => patch({ step: "compare" })).catch(() => {}); }
+      else if (name === "use_last_year_po") { const v = findVendor(input.vendor); if (v) { resolveReference(v.id, { name: "PO-2025-118_Northstar.pdf", url: "/data/reference/PO-2025-118_Northstar.pdf" }); patch({ step: "compare" }); } }
+      else if (name === "draft_clarification") { const v = findVendor(input.vendor); if (v) patch({ step: "compare", mailFor: v.id }); }
+      else if (name === "download") {
+        const s = stRef.current;
+        const sc = (answer?.scenarios || []).filter((x) => x.result?.allocation).slice(-1)[0];
+        if (input.what === "rfx_word") exportRfxDocx(s.rfx);
+        else if (compRef.current) {
+          if (input.what === "comparison_excel") exportComparisonXlsx(compRef.current);
+          else if (sc && input.what === "award_excel") exportComparisonXlsx(compRef.current, sc);
+          else if (sc && input.what === "award_note_word") exportAwardDocx(compRef.current, sc, answer?.text);
+        }
+      }
+    }
+  }, []); // eslint-disable-line
+
   const compState = useMemo(() => st && ({
     rfx: st.rfx, assumptions: st.assumptions,
     vendors: Object.values(st.vendors).filter((v) => v.status === "done" && v.quote).map((v) => ({
@@ -126,6 +159,7 @@ export default function App() {
       secondRead: v.secondRead, reference: v.reference, sourceNumbers: v.sourceNumbers, overrides: v.overrides })),
   }), [st]);
   const comp = useMemo(() => (compState && compState.vendors.length ? buildComparison(compState) : null), [compState]);
+  const compRef = useRef(null); compRef.current = comp;
 
   if (!boot || !st) return <div className="gate"><p style={{ color: "#fff" }}>Loading…</p></div>;
   if (!authed) return <Gate onOk={() => setAuthed(true)} />;
@@ -137,13 +171,15 @@ export default function App() {
     ["send", "Send to vendors", st.sent ? "Sent" : ""],
     ["responses", "Read responses", `${done} of ${total}`],
     ["compare", "Compare", comp ? `${comp.vendors.length} vendors` : ""],
-    ["ask", "Ask the analyst", ""],
   ];
+  const status = { view: st.step, rfx_sent: st.sent, saved_run_available: hasSnapshot,
+    vendors: Object.values(st.vendors).map((v) => ({ vendor: v.short, reply: v.status === "waiting" ? "not received" : v.status, batch: v.batch })),
+    questions_left: Math.max(0, QUESTION_LIMIT - used) };
   const go = (step) => patch({ step });
   const reset = () => { if (confirm("Start over? This clears the RFx edits, responses read, and chats in this browser.")) { localStorage.removeItem(KEY); setSt(initialState(boot.published, boot.manifest)); } };
 
   return (
-    <div className="shell">
+    <div className="shell three">
       <nav className="rail" aria-label="Workflow">
         <div className="brand">Clearbid<small>Quotes in, decisions out</small></div>
         <div className="event"><b>{st.rfx.rfx_id}</b>{st.rfx.title}<br />{st.rfx.buyer_company}</div>
@@ -164,8 +200,8 @@ export default function App() {
         {st.step === "responses" && <ResponsesStep st={st} deliver={deliver} rerun={rerun} addUpload={addUpload} go={go}
           saveRun={saveRun} loadRun={loadRun} hasSnapshot={hasSnapshot} />}
         {st.step === "compare" && <CompareStep st={st} patch={patch} patchVendor={patchVendor} comp={comp} resolveReference={resolveReference} go={go} />}
-        {st.step === "ask" && <AnalystStep st={st} patch={patch} comp={comp} compState={compState} askAllowed={askAllowed} countQuestion={countQuestion} go={go} />}
       </main>
+      <Assistant st={st} patch={patch} comp={comp} compState={compState} status={status} askAllowed={askAllowed} countQuestion={countQuestion} onActions={onActions} />
     </div>
   );
 }
