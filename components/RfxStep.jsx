@@ -25,14 +25,17 @@ export default function RfxStep({ st, patch, published }) {
               <div className="muted small">RFx {rfx.rfx_id} for {rfx.buyer_company}, issued {rfx.issued}, responses due {rfx.due}</div>
             </div>
             <div className="row no-print">
-              {isPublished
-                ? <button className="btn ghost" onClick={() => patch({ rfx: { ...published, rfx_id: "KF-DRAFT-" + Date.now().toString(36).toUpperCase(), title: "New RFx", lines: [], questionnaire: [], terms: [] }, chat: st.chat })}>Start a blank RFx</button>
-                : <button className="btn ghost" onClick={() => patch({ rfx: published })}>Load the RFx vendors received</button>}
+              <button className="btn ghost" onClick={() => patch({ rfx: published })}>Use the RFx vendors received</button>
+              {rfx.lines.length > 0 && <button className="btn ghost" onClick={() => patch({ rfx: { ...published, title: "New RFx (draft)", lines: [], questionnaire: [], terms: [] } })}>Clear</button>}
             </div>
           </div>
-          {!isPublished && <p className="notice small" style={{ marginTop: 12 }}>This is a new draft. The five demo vendor responses were written against RFx {published.rfx_id}; load it before reading responses.</p>}
           <h2>Line items</h2>
-          {!rfx.lines.length ? <p className="muted">No lines yet. Tell the assistant what you need.</p> : (
+          {!rfx.lines.length ? (
+            <div className="notice ok" style={{ marginTop: 6 }}>
+              <p><b>Start by giving the assistant your requirements.</b> Attach an Excel of what the plants need (click + in the assistant) and ask it to draft the RFx. It builds the line items, questionnaire and terms.</p>
+              <p className="small" style={{ margin: 0 }}>No sheet handy? <a href="/data/buyer/Kaveri_PPE_Requirements_FY27.xlsx" download>Download the sample requirements sheet</a>, or click "Draft the RFx from the sample requirements sheet" in the assistant.</p>
+            </div>
+          ) : (
             <div className="scroll-x"><table className="plain">
               <thead><tr><th>Line</th><th>Item</th><th>Specification</th><th>Unit</th><th className="r">Annual qty</th></tr></thead>
               <tbody>

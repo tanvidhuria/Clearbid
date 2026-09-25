@@ -7,6 +7,9 @@
       "when": "Only after Clearbid asks for last year's rates. Not loaded upfront."
     }
   ],
+  "buyer_files": [
+    "buyer/Kaveri_PPE_Requirements_FY27.xlsx"
+  ],
   "arrival_batches": {
     "1": "Arrives first (days 3-5 after RFx)",
     "2": "Arrives later (days 9-10)"
@@ -30,7 +33,8 @@
       "short": "SafeGuard",
       "contact": "Nikhil Rao",
       "email_address": "sales@safeguardindustrial.in",
-      "city": "Mumbai"
+      "city": "Mumbai",
+      "followup": []
     },
     {
       "vendor_id": "V2",
@@ -50,7 +54,10 @@
       "short": "Raksha",
       "contact": "Pooja Malhotra",
       "email_address": "quotes@rakshasafety.co.in",
-      "city": "New Delhi"
+      "city": "New Delhi",
+      "followup": [
+        "responses/02_raksha/followup/email_followup.eml"
+      ]
     },
     {
       "vendor_id": "V3",
@@ -70,7 +77,11 @@
       "short": "Apar",
       "contact": "S. Karthik",
       "email_address": "karthik@aparprotective.in",
-      "city": "Chennai"
+      "city": "Chennai",
+      "followup": [
+        "responses/03_apar/followup/EN388_TestReport_APR-C5.pdf",
+        "responses/03_apar/followup/email_followup.eml"
+      ]
     },
     {
       "vendor_id": "V4",
@@ -89,7 +100,8 @@
       "short": "Balaji",
       "contact": "Manoj Gupta",
       "email_address": "balajitraders.gzb@gmail.com",
-      "city": "Ghaziabad"
+      "city": "Ghaziabad",
+      "followup": []
     },
     {
       "vendor_id": "V5",
@@ -106,7 +118,8 @@
       "short": "Northstar",
       "contact": "Arjun Menon",
       "email_address": "arjun@northstarsafety.com",
-      "city": "Mumbai"
+      "city": "Mumbai",
+      "followup": []
     }
   ]
 }

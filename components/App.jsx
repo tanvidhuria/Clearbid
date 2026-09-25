@@ -25,6 +25,7 @@ function vendorsFromManifest(m) {
         ...r.quote_files.map((p) => ({ name: p.split("/").pop(), url: "/data/" + p, role: "quote" })),
         ...r.attachments.map((p) => ({ name: p.split("/").pop(), url: "/data/" + p, role: "attachment" })),
       ],
+      followupFiles: (r.followup || []).map((p) => ({ name: p.split("/").pop(), url: "/data/" + p, role: "followup" })),
     };
   }
   return out;
@@ -32,10 +33,10 @@ function vendorsFromManifest(m) {
 
 function initialState(published, manifest) {
   return {
-    step: "rfx", rfx: published, copilot: [], sent: false, outbox: [],
+    step: "rfx", rfx: { ...published, title: "New RFx (draft)", lines: [], questionnaire: [], terms: [] }, sent: false, outbox: [],
     vendors: vendorsFromManifest(manifest),
     assumptions: { fx_usd_inr: 88.5, award_date: today(), discounts_enabled: {} },
-    chat: [], emails: {}, mailFor: null,
+    chat: [], emails: {}, mailQueue: [],
   };
 }
 
@@ -90,9 +91,15 @@ export default function App() {
     })();
   }, [st, patchVendor]);
 
-  const deliver = (batch) => patch((s) => ({ ...s, vendors: Object.fromEntries(Object.entries(s.vendors).map(([k, v]) =>
+  const ensureRfx = (s) => (s.rfx.lines.length ? s.rfx : boot.published);
+  const deliver = (batch) => patch((s) => ({ ...s, rfx: ensureRfx(s), vendors: Object.fromEntries(Object.entries(s.vendors).map(([k, v]) =>
     [k, v.batch === batch && v.status === "waiting" ? { ...v, status: "queued", delivered: true } : v])) }));
   const rerun = (id) => patchVendor(id, { status: "queued", error: null });
+  const deliverFollowups = () => patch((s) => ({ ...s, vendors: Object.fromEntries(Object.entries(s.vendors).map(([k, v]) =>
+    [k, v.followupFiles?.length && !v.followupReceived && v.status === "done"
+      ? { ...v, files: [...v.files, ...v.followupFiles], followupReceived: true, status: "queued", before: { landed: null } } : v])) }));
+  const addFilesToVendor = (id, files) => patch((s) => ({ ...s, vendors: { ...s.vendors, [id]: { ...s.vendors[id], status: "queued",
+    files: [...s.vendors[id].files, ...files.map((f) => ({ name: f.name, blob: f, role: "followup" }))] } } }));
   const addUpload = (name, files) => {
     const id = "U" + Date.now().toString(36);
     patch((s) => ({ ...s, vendors: { ...s.vendors, [id]: { id, name, short: name.split(" ")[0], received: today(), batch: 0, status: "queued", delivered: true, uploaded: true,
@@ -124,21 +131,33 @@ export default function App() {
     a.href = URL.createObjectURL(new Blob([JSON.stringify(snap)], { type: "application/json" }));
     a.download = "run.json"; a.click();
   };
-  const applySnapshot = (snap) => patch((s) => ({ ...s, sent: true, vendors: Object.fromEntries(Object.entries(s.vendors).map(([k, v]) =>
+  const applySnapshot = (snap) => patch((s) => ({ ...s, sent: true, rfx: ensureRfx(s), vendors: Object.fromEntries(Object.entries(s.vendors).map(([k, v]) =>
     snap.vendors[k] ? [k, { ...v, ...snap.vendors[k], status: "done", delivered: true, fromSnapshot: snap.savedAt, overrides: {}, reference: null }] : [k, v])) }));
   const loadRun = async (file) => {
     const snap = file ? JSON.parse(await file.text()) : await fetch("/snapshots/run.json").then((r) => r.json());
     applySnapshot(snap);
   };
 
-  const onActions = useCallback((actions, answer) => {
+  const onActions = useCallback((actions, answer, files = []) => {
     for (const { name, input } of actions) {
       if (name === "navigate") patch({ step: input.view });
       else if (name === "send_rfx") { sendRfx(); patch({ step: "send" }); }
-      else if (name === "receive_replies") { if (input.which !== "last") deliver(1); if (input.which !== "first") deliver(2); patch({ step: "responses" }); }
+      else if (name === "receive_replies") {
+        if (input.which === "clarification_replies") deliverFollowups();
+        else { if (input.which !== "last") deliver(1); if (input.which !== "first") deliver(2); }
+        patch({ step: "responses" });
+      }
+      else if (name === "add_vendor_response" && files.length) {
+        const v = findVendor(input.vendor);
+        if (v) addFilesToVendor(v.id, files); else addUpload(input.vendor || "New vendor", files);
+        patch({ step: "responses" });
+      }
       else if (name === "load_saved_run") { loadRun().then(() => patch({ step: "compare" })).catch(() => {}); }
       else if (name === "use_last_year_po") { const v = findVendor(input.vendor); if (v) { resolveReference(v.id, { name: "PO-2025-118_Northstar.pdf", url: "/data/reference/PO-2025-118_Northstar.pdf" }); patch({ step: "compare" }); } }
-      else if (name === "draft_clarification") { const v = findVendor(input.vendor); if (v) patch({ step: "compare", mailFor: v.id }); }
+      else if (name === "draft_clarifications") {
+        const ids = (input.vendors || []).map(findVendor).filter(Boolean).map((v) => v.id);
+        if (ids.length) patch({ step: "compare", mailQueue: [...new Set(ids)] });
+      }
       else if (name === "download") {
         const s = stRef.current;
         const sc = (answer?.scenarios || []).filter((x) => x.result?.allocation).slice(-1)[0];
@@ -172,7 +191,9 @@ export default function App() {
     ["responses", "Read responses", `${done} of ${total}`],
     ["compare", "Compare", comp ? `${comp.vendors.length} vendors` : ""],
   ];
-  const status = { view: st.step, rfx_sent: st.sent, saved_run_available: hasSnapshot,
+  const status = { view: st.step, rfx_lines: st.rfx.lines.length, rfx_sent: st.sent, saved_run_available: hasSnapshot,
+    clarification_emails_sent: Object.keys(st.emails || {}).filter((k) => st.emails[k]?.sent).map((k) => st.vendors[k]?.short),
+    clarification_replies_waiting: Object.values(st.vendors).filter((v) => v.followupFiles?.length && !v.followupReceived && v.status === "done").map((v) => v.short),
     vendors: Object.values(st.vendors).map((v) => ({ vendor: v.short, reply: v.status === "waiting" ? "not received" : v.status, batch: v.batch })),
     questions_left: Math.max(0, QUESTION_LIMIT - used) };
   const go = (step) => patch({ step });
@@ -197,7 +218,7 @@ export default function App() {
       <main className="main">
         {st.step === "rfx" && <RfxStep st={st} patch={patch} published={boot.published} askAllowed={askAllowed} countQuestion={countQuestion} />}
         {st.step === "send" && <SendStep st={st} patch={patch} go={go} />}
-        {st.step === "responses" && <ResponsesStep st={st} deliver={deliver} rerun={rerun} addUpload={addUpload} go={go}
+        {st.step === "responses" && <ResponsesStep st={st} deliver={deliver} deliverFollowups={deliverFollowups} rerun={rerun} addUpload={addUpload} go={go}
           saveRun={saveRun} loadRun={loadRun} hasSnapshot={hasSnapshot} />}
         {st.step === "compare" && <CompareStep st={st} patch={patch} patchVendor={patchVendor} comp={comp} resolveReference={resolveReference} go={go} />}
       </main>

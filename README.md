@@ -7,7 +7,8 @@ Draft an RFx with an AI co-pilot, read vendor replies in any format (Excel, PDF,
 - **AI reads, code calculates.** Claude extracts what each vendor stated (price, unit, pack size, terms, documents). Plain code in `lib/core.js` and `lib/scenarios.js` does every conversion, total and award scenario.
 - **Every number has a source.** Click any cell to see the file, location and quote it came from, plus the conversion formula.
 - **Gaps are found, not guessed.** Missing lines, unclear units, "same as last year", wrong attachments and expired certificates are flagged, with a drafted email to the vendor.
-- **Checked answers.** The analyst answers by calling tools over the comparison. Every number in an answer is matched against tool results before it is shown.
+- **One assistant.** A single chat panel beside every screen drafts the RFx, runs the workflow (send, receive, load, clarify, download) and answers questions.
+- **Checked answers.** The assistant answers by calling tools over the comparison. Every number in an answer is matched against tool results before it is shown.
 - **Guardrails.** Vendor files are treated as data. Text that tries to instruct the AI is ignored and reported (a code scan backs up the model).
 
 ## Setup (Vercel)

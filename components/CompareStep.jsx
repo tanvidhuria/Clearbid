@@ -16,9 +16,10 @@ export default function CompareStep({ st, patch, patchVendor, comp, resolveRefer
       <p className="notice">Receive and read at least one vendor response first. <button className="btn ghost" onClick={() => go("responses")}>Go to responses</button></p>
     </>
   );
-  const mailV = st.mailFor ? comp.vendors.find((v) => v.id === st.mailFor) : null;
-  const mail = mailV ? { vendor: mailV } : null;
-  const setMail = (m) => patch({ mailFor: m ? m.vendor.id : null });
+  const queue = (st.mailQueue || []).filter((id) => comp.vendors.some((v) => v.id === id));
+  const mailV = queue.length ? comp.vendors.find((v) => v.id === queue[0]) : null;
+  const mail = mailV ? { vendor: mailV, pos: `${1} of ${queue.length}` } : null;
+  const setMail = (m) => patch((s) => ({ ...s, mailQueue: m ? [m.vendor.id, ...(s.mailQueue || []).filter((x) => x !== m.vendor.id)] : (s.mailQueue || []).slice(1) }));
   const setA = (p) => patch((s) => ({ ...s, assumptions: { ...s.assumptions, ...p } }));
   const refVendors = comp.vendors.filter((v) => v.reference_count > 0 || st.vendors[v.id]?.reference);
   const review = comp.vendors.reduce((a, v) => a + v.review_count, 0);
@@ -78,7 +79,7 @@ export default function CompareStep({ st, patch, patchVendor, comp, resolveRefer
       {tab === "evidence" && <Evidence comp={comp} />}
 
       {sel && <Drawer key={sel.line + sel.vendor} comp={comp} sel={sel} onClose={() => setSel(null)} st={st} patchVendor={patchVendor} />}
-      {mail && <MailModal vendor={mail.vendor} comp={comp} st={st} patch={patch} onClose={() => setMail(null)} />}
+      {mail && <MailModal key={mail.vendor.id} pos={queue.length > 1 ? `${queue.length} emails to review` : ""} vendor={mail.vendor} comp={comp} st={st} patch={patch} onClose={() => setMail(null)} />}
     </>
   );
 }
@@ -290,7 +291,7 @@ function Evidence({ comp }) {
   );
 }
 
-function MailModal({ vendor, comp, st, patch, onClose }) {
+function MailModal({ vendor, comp, st, patch, onClose, pos }) {
   const existing = st.emails?.[vendor.id];
   const [draft, setDraft] = useState(existing || null);
   const [busy, setBusy] = useState(false);
@@ -312,7 +313,7 @@ function MailModal({ vendor, comp, st, patch, onClose }) {
   return (
     <div className="modal-back" role="dialog" aria-modal="true" aria-label="Clarification email">
       <div className="modal">
-        <header><h2>Clarification for {vendor.short}</h2><button className="btn ghost" onClick={onClose}>Close</button></header>
+        <header><div><h2>Clarification for {vendor.short}</h2>{pos && <div className="small muted">{pos}</div>}</div><button className="btn ghost" onClick={onClose}>{pos ? "Skip" : "Close"}</button></header>
         <div className="body">
           <div><h3 style={{ marginBottom: 4 }}>What we need to ask</h3><ul className="issues">{asks.map((a, i) => <li key={i}>{a}</li>)}</ul></div>
           {!draft ? <button className="btn primary" onClick={make} disabled={busy || !asks.length}>{busy ? "Drafting…" : "Draft the email"}</button> : (<>

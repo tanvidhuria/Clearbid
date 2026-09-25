@@ -12,7 +12,7 @@ function EmailBody({ url }) {
   return t ? <div className="email-preview">{t}</div> : null;
 }
 
-export default function ResponsesStep({ st, deliver, rerun, addUpload, go, saveRun, loadRun, hasSnapshot }) {
+export default function ResponsesStep({ st, deliver, deliverFollowups, rerun, addUpload, go, saveRun, loadRun, hasSnapshot }) {
   const vendors = Object.values(st.vendors);
   const waiting = (b) => vendors.some((v) => v.batch === b && v.status === "waiting");
   const done = vendors.filter((v) => v.status === "done").length;
@@ -33,6 +33,8 @@ export default function ResponsesStep({ st, deliver, rerun, addUpload, go, saveR
         <div className="row">
           {waiting(1) && <button className="btn primary" onClick={() => deliver(1)}>Receive first 3 replies</button>}
           {!waiting(1) && waiting(2) && <button className="btn primary" onClick={() => deliver(2)}>Receive the last 2 replies</button>}
+          {vendors.some((v) => v.followupFiles?.length && !v.followupReceived && v.status === "done") && !busy &&
+            <button className="btn" onClick={deliverFollowups}>Receive clarification replies</button>}
           {done > 0 && !busy && <button className="btn primary" onClick={() => go("compare")}>Compare {done} responses</button>}
         </div>
       </div>

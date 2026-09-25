@@ -96,24 +96,45 @@ export default function Assistant({ st, patch, comp, compState, status, askAllow
         const r = await api("/api/assistant", { messages: history, state: { ...state, rfx: cur.st.rfx }, status: cur.status, attachments });
         patch((s) => ({ ...s, chat: [...msgs, { role: "assistant", answer: r }],
           rfx: r.rfxUpdate ? { ...s.rfx, ...Object.fromEntries(Object.entries(r.rfxUpdate).filter(([, v]) => v !== undefined)) } : s.rfx }));
-        if (r.actions?.length) onActions(r.actions, r);
+        if (r.actions?.length) onActions(r.actions, r, qf);
       } catch (e) { setErr(e.message); }
       setQueue((q) => q.slice(1)); setBusy(false);
     })();
   }, [queue, busy, patch, onActions]);
 
-  const ask = (text) => {
+  const ask = async (text, sample) => {
     const q = (text ?? input).trim();
     if (!q) return;
+    let withFiles = files;
+    if (sample) {
+      const blob = await fetch(sample).then((r) => r.blob());
+      withFiles = [new File([blob], sample.split("/").pop(), { type: blob.type })];
+    }
     if (!askAllowed) { setErr(`You've used all ${QUESTION_LIMIT} AI questions for this demo in this browser.`); return; }
     countQuestion(); setErr(""); setInput("");
-    setQueue((qq) => [...qq, { text: q, files }]); setFiles([]);
+    setQueue((qq) => [...qq, { text: q, files: withFiles }]); setFiles([]);
   };
 
-  const read = !!comp;
-  const ideas = !read
-    ? [!st.sent ? "Add an exchange rate clause for imported items" : null, !st.sent ? "Send the RFx to all vendors" : "Receive the first replies", "Load the saved run"].filter(Boolean)
-    : ANALYST_QS.filter((q) => !st.chat.some((m) => m.content === q)).slice(0, 3);
+  const SAMPLE = "/data/buyer/Kaveri_PPE_Requirements_FY27.xlsx";
+  const asked = (q) => st.chat.some((m) => (m.content || "").startsWith(q));
+  const vs = Object.values(st.vendors);
+  const followWaiting = vs.some((v) => v.followupFiles?.length && !v.followupReceived && v.status === "done");
+  const followDone = vs.some((v) => v.followupReceived && v.status === "done");
+  const mailed = Object.values(st.emails || {}).some((e) => e?.sent);
+  let ideas;
+  if (!st.rfx.lines.length) ideas = [["Draft the RFx from the sample requirements sheet", SAMPLE], ["Load the saved run"]];
+  else if (!st.sent && !comp) ideas = [["Add an exchange rate clause for imported items"], ["Send the RFx to all vendors"]];
+  else if (!comp) ideas = [["Receive the first replies"], ["Load the saved run"]];
+  else {
+    const flow = [
+      ["Which vendor is best overall? Compare them and show a chart."],
+      ["Are there errors or missing items? Draft emails to the vendors."],
+      mailed && followWaiting ? ["Receive the clarification replies"] : null,
+      followDone ? ["What changed after the vendors' replies? Is the best vendor still the same?"] : null,
+      ...ANALYST_QS.map((q) => [q]),
+    ].filter(Boolean);
+    ideas = flow.filter(([q]) => !asked(q)).slice(0, 3);
+  }
 
   return (
     <aside className="assistant" aria-label="Clearbid assistant">
@@ -130,7 +151,7 @@ export default function Assistant({ st, patch, comp, compState, status, askAllow
         {busy && <div className="thinking">Working on it</div>}
         {queue.length > 1 && <div className="small muted">Queued next: {queue.slice(1).map((q) => q.text).join("; ")}</div>}
       </div>
-      <div className="suggest">{ideas.map((q) => <button key={q} onClick={() => ask(q)}>{q}</button>)}</div>
+      <div className="suggest">{ideas.map(([q, sample]) => <button key={q} onClick={() => ask(q, sample)}>{q}</button>)}</div>
       {err && <p className="err small" style={{ padding: "0 14px" }}>{err}</p>}
       {files.length > 0 && <p className="small muted" style={{ padding: "0 14px" }}>Attached: {files.map((f) => f.name).join(", ")}</p>}
       <div className="chat-input">

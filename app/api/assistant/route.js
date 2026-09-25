@@ -5,7 +5,7 @@ import { overview, getLines, vendorDetails, runScenario, fxSensitivity, openIssu
 import { allowedNumbers, unverifiedNumbers } from "../../../lib/verify.js";
 
 export const maxDuration = 300;
-const ACTIONS = new Set(["navigate", "send_rfx", "receive_replies", "load_saved_run", "use_last_year_po", "draft_clarification", "download"]);
+const ACTIONS = new Set(["navigate", "send_rfx", "receive_replies", "load_saved_run", "add_vendor_response", "use_last_year_po", "draft_clarifications", "download"]);
 const DATA = { get_overview: overview, get_lines: getLines, get_vendor_details: vendorDetails, run_award_scenario: runScenario,
   fx_sensitivity: fxSensitivity, list_open_issues: openIssues };
 
